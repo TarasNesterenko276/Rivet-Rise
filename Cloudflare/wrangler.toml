@@ -1,0 +1,14 @@
+name = "rivet-rise"
+main = "worker.mjs"
+compatibility_date = "2026-11-18"
+account_id = "c7e9f26b33eb692ea90bf46e29cdfe2d"
+workers_dev = false
+preview_urls = false
+routes = [
+  { pattern = "rivetrise.website", custom_domain = true },
+]
+
+[assets]
+directory = "../Site"
+binding = "ASSETS"
+run_worker_first = ["/check*", "/health*"]

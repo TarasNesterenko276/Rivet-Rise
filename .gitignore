@@ -1,0 +1,13 @@
+xcuserdata/
+DerivedData/
+*.xcresult
+.DS_Store
+*.bak
+/Config/Integration.xcconfig
+/Config/Secrets.xcconfig
+/Config/*.secrets.xcconfig
+/Supabase/.env.local
+/Cloudflare/.dev.vars
+/Cloudflare/.env
+/Cloudflare/node_modules/
+/Cloudflare/.wrangler/

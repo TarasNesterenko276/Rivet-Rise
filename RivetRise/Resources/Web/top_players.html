@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Top Players</title>
+<!--
+  Rivet Rise — TOP PLAYERS board template (bundled, works offline).
+  Native → web: window.RivetBoard.render(payload) with the WeeklyBoard JSON
+  (see LeaderboardService.swift). Web → native: webkit.messageHandlers.rivetBoard.postMessage
+  with {type: "ready"} once loaded and {type: "slot", id} when a reward slot is tapped.
+-->
+<style>
+  :root {
+    --hivis: #F5C21C; --hivis-deep: #C9940A; --ink: #1F1B16; --ink-soft: #544A3B;
+    --asphalt: #23262B; --graphite: #343841; --concrete: #BAB5AD; --manila: #EADBB8;
+    --kraft: #C89B62; --green: #2A7F45; --red: #BF2E1F; --led: #FF9E33;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: transparent; color: var(--ink);
+    font-family: "Trebuchet MS", -apple-system, sans-serif; -webkit-text-size-adjust: 100%; }
+  body { padding: 12px 14px 28px; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  .display { font-family: "HelveticaNeue-CondensedBlack", "Helvetica Neue", sans-serif; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+  .typed { font-family: "American Typewriter", Courier, monospace; }
+
+  .season { background: var(--graphite); color: #DEDBD3; border: 2px solid var(--ink); border-radius: 10px;
+    padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .season .name { color: var(--hivis); font-size: 18px; }
+  .season .clock { font-family: Menlo, monospace; color: var(--led); text-shadow: 0 0 6px rgba(255,158,51,.7); font-size: 15px; text-align: right; }
+  .mock { margin-top: 8px; font-size: 12px; color: var(--ink); background: repeating-linear-gradient(135deg, var(--hivis) 0 10px, #F7D867 10px 20px);
+    border: 2px solid var(--ink); border-radius: 6px; padding: 4px 8px; }
+
+  .board { margin-top: 14px; background: var(--manila); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 10px 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,.35); }
+  .board h2 { margin: 6px 0 8px; font-size: 20px; }
+  .row { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 8px; padding: 9px 4px;
+    border-bottom: 1px dashed rgba(31,27,22,.35); }
+  .row:last-child { border-bottom: 0; }
+  .rank { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center;
+    font-size: 16px; background: #fff8e4; }
+  .r1 .rank { background: #F0C24A; } .r2 .rank { background: #D9DEE4; } .r3 .rank { background: #D9925A; }
+  .crew { font-weight: bold; font-size: 16px; }
+  .league { font-size: 12px; color: var(--ink-soft); }
+  .stat { text-align: right; }
+  .stat .floors { font-size: 20px; }
+  .stat .score { font-size: 12px; color: var(--ink-soft); }
+  .you { background: rgba(245,194,28,.45); border-radius: 6px; }
+  .gap { text-align: center; color: var(--ink-soft); padding: 2px 0; letter-spacing: .3em; }
+  .empty { padding: 10px 4px; color: var(--ink-soft); }
+
+  .rewards { margin-top: 16px; }
+  .rewards h2 { color: #DEDBD3; font-size: 18px; margin: 0 0 8px; }
+  .slot { display: grid; grid-template-columns: 54px 1fr auto; gap: 10px; align-items: center; background: var(--kraft);
+    border: 2px solid var(--ink); border-radius: 8px; padding: 10px; margin-bottom: 10px; min-height: 64px; cursor: pointer; }
+  .slot .badge { width: 54px; height: 54px; border-radius: 10px; border: 2px solid var(--ink); display: grid; place-items: center; font-size: 15px; background: var(--asphalt); color: var(--hivis); }
+  .slot .t { font-size: 17px; }
+  .slot .d { font-size: 13px; }
+  .slot .state { font-size: 12px; padding: 4px 8px; border-radius: 4px; border: 2px solid var(--ink); background: #fff8e4; white-space: nowrap; }
+  .slot.locked { filter: saturate(.35); opacity: .85; }
+  .slot.pending .state { background: var(--hivis); }
+  .slot.claimable .state { background: var(--green); color: #fff; }
+  .note { color: #DEDBD3; font-size: 13px; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="season" id="season">
+    <div><div class="display name" id="seasonName">Season</div><div class="typed" id="week" style="font-size:13px">Week</div></div>
+    <div class="clock" id="clock" aria-label="Time left this week">--</div>
+  </div>
+  <div class="mock typed" id="mock" hidden>Practice board: rivals are sample crews until the league office opens.</div>
+
+  <section class="board" aria-label="Top five crews this week">
+    <h2 class="display">Top 5 this week</h2>
+    <div id="rows"><div class="empty typed">Loading the board…</div></div>
+  </section>
+
+  <section class="rewards" aria-label="Weekly rewards">
+    <h2 class="display">Weekly rewards</h2>
+    <div id="slots"></div>
+    <p class="note">Rewards are exclusive crane and roof details, handed out when the week closes on Monday 00:00 UTC.</p>
+  </section>
+</div>
+<script>
+(function () {
+  const leagues = { scaffold: "Scaffold League", girder: "Girder League", rivet: "Gold Rivet League", skyline: "Skyline League" };
+  const stateText = { locked: "Locked", pending: "Holding", claimable: "Claim", claimed: "Claimed" };
+  let endsAt = null;
+
+  function esc(text) {
+    return String(text).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function number(n) { return Number(n).toLocaleString("en-US"); }
+  function post(message) {
+    if (window.webkit && webkit.messageHandlers && webkit.messageHandlers.rivetBoard) {
+      webkit.messageHandlers.rivetBoard.postMessage(message);
+    }
+  }
+  function row(entry) {
+    return `<div class="row r${entry.rank}${entry.isPlayer ? " you" : ""}" role="listitem"
+      aria-label="Rank ${entry.rank}, ${esc(entry.crewName)}, ${entry.floors} floors, ${number(entry.score)} points">
+      <div class="rank display">${entry.rank}</div>
+      <div><div class="crew">${esc(entry.crewName)}</div><div class="league">${leagues[entry.league] || ""}</div></div>
+      <div class="stat"><div class="floors display">${entry.floors} fl</div><div class="score typed">${number(entry.score)} pts</div></div>
+    </div>`;
+  }
+  function tick() {
+    if (!endsAt) return;
+    const left = Math.max(0, endsAt - Date.now());
+    const d = Math.floor(left / 86400000), h = Math.floor(left / 3600000) % 24, m = Math.floor(left / 60000) % 60;
+    document.getElementById("clock").textContent = `${d}d ${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m left`;
+  }
+
+  window.RivetBoard = {
+    render(board) {
+      document.getElementById("seasonName").textContent = board.seasonName;
+      document.getElementById("week").textContent = `Week ${board.week}`;
+      document.getElementById("mock").hidden = !board.isMock;
+      endsAt = new Date(board.endsAt).getTime();
+      tick();
+
+      let html = board.entries.map(row).join("");
+      if (board.playerRow) html += `<div class="gap">• • •</div>` + row(board.playerRow);
+      if (!board.entries.some(e => e.isPlayer) && !board.playerRow) {
+        html += `<div class="empty typed">Finish a shift this week to put your crew on the board.</div>`;
+      }
+      document.getElementById("rows").innerHTML = html;
+
+      document.getElementById("slots").innerHTML = board.rewards.map(slot => `
+        <div class="slot ${slot.state}" role="button" tabindex="0" data-id="${esc(slot.id)}"
+          aria-label="${esc(slot.title)}, ranks ${esc(slot.ranks)}, ${stateText[slot.state]}">
+          <div class="badge display">${esc(slot.ranks)}</div>
+          <div><div class="t display">${esc(slot.title)}</div><div class="d">${esc(slot.detail)}</div></div>
+          <div class="state display">${stateText[slot.state]}</div>
+        </div>`).join("");
+      document.querySelectorAll(".slot").forEach(el => el.addEventListener("click", () => post({ type: "slot", id: el.dataset.id })));
+    }
+  };
+  setInterval(tick, 30000);
+  post({ type: "ready" });
+})();
+</script>
+</body>
+</html>

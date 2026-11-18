@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rivet Rise — build the tower, ride the sway</title>
+<meta name="description" content="Rivet Rise is a one-tap crane game for iPhone: drop floor modules, ride the tower's sway, strike rivets on the beat and climb the weekly building league.">
+<link rel="canonical" href="https://rivetrise.website/">
+<meta property="og:title" content="Rivet Rise">
+<meta property="og:description" content="Drop the module. Ride the sway. Strike the rivet. A one-tap crane game for iPhone.">
+<meta property="og:image" content="https://rivetrise.website/assets/icon-512.png">
+<meta property="og:url" content="https://rivetrise.website/">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/icon-512.png">
+<link rel="apple-touch-icon" href="assets/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Special+Elite&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hivis: #F5C21C; --hivis-deep: #C9940A; --ink: #1F1B16; --ink-soft: #544A3B;
+    --asphalt: #23262B; --graphite: #343841; --concrete: #BAB5AD; --concrete-light: #DEDBD3;
+    --manila: #EADBB8; --kraft: #C89B62; --rust: #C4552B; --steel: #4C6B86;
+    --teal: #3FA6B5; --peach: #F6C59A; --green: #2A7F45; --led: #FF9E33;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; color: var(--concrete-light); background: var(--asphalt) url("assets/art/tex_concrete.png") repeat;
+    background-size: 160px; font-family: "Source Sans 3", "Trebuchet MS", sans-serif; font-size: 18px; line-height: 1.55; }
+  body::before { content: ""; position: fixed; inset: 0; background: rgba(28,30,34,.82); z-index: -1; }
+  a { color: var(--hivis); }
+  img { max-width: 100%; display: block; }
+  .display { font-family: "Oswald", "Helvetica Neue", sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .typed { font-family: "Special Elite", "American Typewriter", monospace; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+  .hazard { height: 12px; background: repeating-linear-gradient(135deg, var(--hivis) 0 14px, var(--ink) 14px 28px); }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 10; background: var(--graphite); border-bottom: 2px solid var(--ink); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--hivis); text-decoration: none; font-size: 22px; }
+  .brand img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--ink); }
+  nav { display: flex; gap: 18px; flex-wrap: wrap; }
+  nav a { color: var(--concrete-light); text-decoration: none; font-size: 15px; }
+  nav a:hover { color: var(--hivis); }
+
+  /* Hero */
+  .hero { background: linear-gradient(180deg, #3E8EA8 0%, #86C1C2 45%, var(--peach) 80%, #F3A372 100%); color: var(--ink); overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding-top: 56px; padding-bottom: 56px; }
+  .hero h1 { margin: 18px 0 10px; font-size: clamp(34px, 5vw, 58px); line-height: 1.05; }
+  .hero p.lead { font-size: 20px; max-width: 34em; }
+  .badge { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--hivis); border-radius: 12px;
+    padding: 12px 18px; font-size: 16px; border: 2px solid var(--ink); box-shadow: 0 5px 0 rgba(0,0,0,.35); }
+  .badge small { display: block; color: var(--concrete-light); font-size: 12px; letter-spacing: .08em; }
+  .phone { width: min(320px, 80%); margin: 0 auto; border: 10px solid var(--ink); border-radius: 44px; overflow: hidden;
+    box-shadow: 0 22px 40px rgba(0,0,0,.35); background: var(--ink); transform: rotate(2deg); }
+  .logo { max-width: 360px; }
+
+  section { padding: 72px 0; }
+  h2 { font-size: clamp(28px, 3.4vw, 40px); margin: 0 0 8px; color: var(--hivis); }
+  .sub { color: var(--concrete); margin: 0 0 30px; max-width: 46em; }
+
+  /* Paper cards */
+  .grid { display: grid; gap: 20px; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .card { background: var(--manila) url("assets/art/tex_manila.png"); background-size: 120px; color: var(--ink);
+    border: 2px solid var(--ink); border-radius: 10px; padding: 22px; box-shadow: 0 6px 12px rgba(0,0,0,.35); }
+  .card h3 { margin: 6px 0 6px; font-size: 22px; }
+  .card p { margin: 0; color: var(--ink); }
+  .card img.art { width: 100%; border-radius: 8px; border: 2px solid var(--ink); margin-bottom: 12px; background: #7FBBC0; }
+  .card .icon { width: 64px; height: 64px; }
+
+  /* Steps */
+  .steps { counter-reset: step; }
+  .step { position: relative; padding-left: 70px; }
+  .step::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0; width: 52px; height: 52px;
+    display: grid; place-items: center; background: var(--hivis); color: var(--ink); border: 2px solid var(--ink); border-radius: 50%;
+    font-family: "Oswald", sans-serif; font-weight: 700; font-size: 24px; box-shadow: 0 4px 0 var(--ink); }
+
+  /* Crew */
+  .crew { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+  .crew figure { margin: 0; text-align: center; }
+  .crew img { border-radius: 14px; border: 2px solid var(--ink); }
+  .crew figcaption { margin-top: 6px; font-size: 15px; }
+  .crew figcaption b { display: block; color: var(--hivis); font-family: "Oswald", sans-serif; text-transform: uppercase; }
+  .modules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 26px; }
+  .modules figure { margin: 0; }
+  .modules img { border: 2px solid var(--ink); border-radius: 4px; }
+  .modules figcaption { font-size: 14px; color: var(--concrete); margin-top: 4px; }
+
+  /* Gallery */
+  .gallery { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 14px; scroll-snap-type: x mandatory; }
+  .gallery figure { flex: 0 0 230px; margin: 0; scroll-snap-align: start; }
+  .gallery img { border: 6px solid var(--ink); border-radius: 26px; }
+  .gallery figcaption { font-size: 15px; margin-top: 8px; color: var(--concrete-light); }
+
+  /* League */
+  .league { display: grid; grid-template-columns: .9fr 1.1fr; gap: 30px; align-items: center; }
+  .tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+  .tier { background: var(--graphite); border: 2px solid var(--ink); border-radius: 8px; padding: 10px; text-align: center; font-size: 14px; }
+  .tier b { display: block; color: var(--hivis); font-family: "Oswald", sans-serif; text-transform: uppercase; }
+
+  /* Platforms */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { background: var(--hivis); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 8px 16px; font-weight: 700; }
+
+  /* FAQ */
+  details { background: var(--manila); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; }
+  summary { cursor: pointer; font-weight: 700; }
+  details p { margin: 10px 0 0; }
+
+  /* Legal */
+  .legal { background: var(--manila) url("assets/art/tex_manila.png"); background-size: 120px; color: var(--ink); border: 2px solid var(--ink);
+    border-radius: 10px; padding: 28px; margin-bottom: 26px; }
+  .legal h2 { color: var(--ink); }
+  .legal h3 { margin: 18px 0 4px; font-size: 18px; }
+  .legal p, .legal li { color: var(--ink); }
+
+  footer { background: var(--graphite); border-top: 2px solid var(--ink); padding: 28px 0; font-size: 15px; color: var(--concrete); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 880px) {
+    .hero .wrap, .league { grid-template-columns: 1fr; }
+    .g3, .g2 { grid-template-columns: 1fr; }
+    .crew { grid-template-columns: repeat(3, 1fr); }
+    .modules, .tiers { grid-template-columns: repeat(2, 1fr); }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand display" href="#top"><img src="assets/icon-512.png" alt="">Rivet Rise</a>
+    <nav class="display">
+      <a href="#about">About</a><a href="#how">How it works</a><a href="#mechanics">Mechanics</a>
+      <a href="#league">League</a><a href="#gallery">Screens</a><a href="#support">Support</a><a href="#privacy">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <img class="logo" src="assets/art/logo.png" alt="Rivet Rise">
+        <h1 class="display">Drop the module.<br>Ride the sway.<br>Strike the rivet.</h1>
+        <p class="lead">A one-tap crane game for iPhone. Swing floor modules onto a skyscraper, land them in rhythm with the swaying tower, drive rivets on the beat and climb the weekly building league.</p>
+        <div class="badge display"><span>&#63743;</span><span><small>Coming soon on the</small>App Store</span></div>
+      </div>
+      <div class="phone"><img src="assets/screens/v1-08-shift-early.png" alt="Rivet Rise gameplay: the crane lowers a module onto an office tower"></div>
+    </div>
+  </div>
+  <div class="hazard"></div>
+
+  <section id="about">
+    <div class="wrap">
+      <h2 class="display">About the game</h2>
+      <p class="sub">Every floor is one tap. How tall the tower gets is up to your timing.</p>
+      <div class="grid g3">
+        <div class="card"><img class="icon" src="assets/art/hard_hat.png" alt=""><h3 class="display">One tap, real skill</h3><p>Tap to drop, tap again to rivet. Easy to start, with plenty of room to get better at every height.</p></div>
+        <div class="card"><img class="icon" src="assets/art/icon_bolt.png" alt=""><h3 class="display">Earn, upgrade, hire</h3><p>Every shift pays bolts. Hoist crane upgrades in the Rigging Yard and hire six foremen, each with their own perk.</p></div>
+        <div class="card"><img class="icon" src="assets/art/pict_board.png" alt=""><h3 class="display">A new week, a new league</h3><p>Climb the weekly Top 5, finish site orders for precision and rivet streaks, and compete for exclusive crane details.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" style="background: rgba(0,0,0,.18)">
+    <div class="wrap">
+      <h2 class="display">How it works</h2>
+      <p class="sub">A shift on the crane, start to finish.</p>
+      <div class="grid g3 steps">
+        <div class="step"><h3 class="display">Clock in</h3><p>Punch your card at the site's time clock. Your foreman takes the cab and the hook starts to swing.</p></div>
+        <div class="step"><h3 class="display">Build</h3><p>Drop modules, keep them centred and ride the sway. Overhangs get cut off, and Perfect drops widen the module again.</p></div>
+        <div class="step"><h3 class="display">Get paid</h3><p>Lose all three hard hats and the shift ends. Your points arrive in a pay envelope as bolts to spend on upgrades.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="mechanics">
+    <div class="wrap">
+      <h2 class="display">Signature mechanics</h2>
+      <p class="sub">Six systems that work together, so no two towers turn out the same.</p>
+      <div class="grid g2">
+        <div class="card"><img class="art" src="assets/art/manual_sway.png" alt="Three swaying towers with a green in-tune line"><h3 class="display">Sway rhythm</h3><p>The tower sways more the higher it gets. Land a module while the top passes the centre to be <b>In Tune</b> and calm it. Off-beat landings rock it until it collapses.</p></div>
+        <div class="card"><img class="art" src="assets/art/manual_rivet.png" alt="A rivet ring closing on a joint"><h3 class="display">Rivet strike</h3><p>After each landing, a ring closes in on the joint. Tap as it hits the mark to rivet the floor for double points. When the tower collapses, only floors above the last rivet fall.</p></div>
+        <div class="card"><img class="art" src="assets/art/manual_districts.png" alt="Three office floors forming a district"><h3 class="display">Tenant districts</h3><p>Stack three Residential, Office or Sky Garden floors in a row to form a district. Districts pay points or bolts, or halve the sway. A Penthouse rivets every floor below it.</p></div>
+        <div class="card"><img class="art" src="assets/art/manual_wind.png" alt="Wind gusts pushing the crane hook"><h3 class="display">Wind &amp; Rush</h3><p>The weathervane warns you before a gust pushes the hook. Quick drops build Rush, a multiplier of up to x2, but the hook swings faster too.</p></div>
+        <div class="card"><img class="art" src="assets/art/manual_shifts.png" alt="A creaking cable at night"><h3 class="display">Cable snap &amp; site shifts</h3><p>A creaking cable will drop the module by itself. Land it perfectly anyway for a Cable Catch. Every ten floors a new shift starts: fog, night, a jumpy crane, steel girders or dead calm.</p></div>
+        <div class="card"><img class="art" src="assets/art/manual_drop.png" alt="A module trimmed at the edge"><h3 class="display">Trim &amp; regrow</h3><p>Any overhang is cut off and tumbles away. Land four Perfect drops in a row and the module widens again.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="crew" style="background: rgba(0,0,0,.18)">
+    <div class="wrap">
+      <h2 class="display">The crew &amp; the floors</h2>
+      <p class="sub">Six foremen, each with a perk that changes how you play.</p>
+      <div class="crew">
+        <figure><img src="assets/art/foreman_gus.png" alt="Gus"><figcaption><b>Gus</b>Second Chance</figcaption></figure>
+        <figure><img src="assets/art/foreman_mira.png" alt="Mira"><figcaption><b>Mira</b>Steady Hands</figcaption></figure>
+        <figure><img src="assets/art/foreman_dolores.png" alt="Dolores"><figcaption><b>Dolores</b>Wind Reader</figcaption></figure>
+        <figure><img src="assets/art/foreman_kenji.png" alt="Kenji"><figcaption><b>Kenji</b>Green Thumb</figcaption></figure>
+        <figure><img src="assets/art/foreman_tony.png" alt="Big Tony"><figcaption><b>Big Tony</b>Iron Back</figcaption></figure>
+        <figure><img src="assets/art/foreman_ola.png" alt="Ola"><figcaption><b>Ola</b>Rush Hour</figcaption></figure>
+      </div>
+      <div class="modules">
+        <figure><img src="assets/art/floor_residential.png" alt="Residential floor"><figcaption>Residential</figcaption></figure>
+        <figure><img src="assets/art/floor_office.png" alt="Office floor"><figcaption>Office</figcaption></figure>
+        <figure><img src="assets/art/floor_garden.png" alt="Sky Garden floor"><figcaption>Sky Garden</figcaption></figure>
+        <figure><img src="assets/art/floor_penthouse.png" alt="Penthouse floor"><figcaption>Penthouse</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="league">
+    <div class="wrap league">
+      <div class="phone" style="transform: rotate(-2deg)"><img src="assets/screens/v1-06a-top-players.png" alt="Top Players weekly board"></div>
+      <div>
+        <h2 class="display">Weekly building league</h2>
+        <p>Your tallest tower each week decides your league. The Top 5 crews compete for exclusive crane and roof details: a Gold Leaf Jib, a Neon Crown and a Chrome Hook.</p>
+        <div class="tiers">
+          <div class="tier"><b>Scaffold</b>0+ floors</div>
+          <div class="tier"><b>Girder</b>20+ floors</div>
+          <div class="tier"><b>Gold Rivet</b>35+ floors</div>
+          <div class="tier"><b>Skyline</b>50+ floors</div>
+        </div>
+        <p>Weekly <b>Site Orders</b> pay bolts for precision, rivet streaks, districts and height. New orders arrive every Monday.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" style="background: rgba(0,0,0,.18)">
+    <div class="wrap">
+      <h2 class="display">Screens</h2>
+      <p class="sub">Captured from the iPhone version.</p>
+      <div class="gallery">
+        <figure><img src="assets/screens/v1-01-site.png" alt=""><figcaption>The building site: clock in, or send the hoist to another floor.</figcaption></figure>
+        <figure><img src="assets/screens/v1-07-briefing.png" alt=""><figcaption>The job sheet before every shift.</figcaption></figure>
+        <figure><img src="assets/screens/v1-08-shift-early.png" alt=""><figcaption>Lowering an office module onto the tower.</figcaption></figure>
+        <figure><img src="assets/screens/v1-09-shift-mid.png" alt=""><figcaption>Riveted! Points doubled, sway calmed.</figcaption></figure>
+        <figure><img src="assets/screens/v1-11-pay-envelope.png" alt=""><figcaption>The pay envelope: your shift, typed up.</figcaption></figure>
+        <figure><img src="assets/screens/v1-02-rigging-yard.png" alt=""><figcaption>Rigging Yard: crane upgrades hanging on hooks.</figcaption></figure>
+        <figure><img src="assets/screens/v1-03-crew-lockers.png" alt=""><figcaption>Crew Lockers: hire foremen with their own perks.</figcaption></figure>
+        <figure><img src="assets/screens/v1-04-site-log.png" alt=""><figcaption>Site Log: records, hard hat stickers and your timesheet.</figcaption></figure>
+        <figure><img src="assets/screens/v1-05-manual-rivet.png" alt=""><figcaption>The illustrated site manual.</figcaption></figure>
+        <figure><img src="assets/screens/v1-06a-top-players.png" alt=""><figcaption>Top Players: the weekly league.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="platforms">
+    <div class="wrap">
+      <h2 class="display">Platforms</h2>
+      <div class="chips"><span class="chip">iPhone</span><span class="chip">iOS 15 or later</span><span class="chip">Plays offline</span><span class="chip">No ads</span><span class="chip">No in-app purchases</span></div>
+    </div>
+  </section>
+
+  <section id="support" style="background: rgba(0,0,0,.18)">
+    <div class="wrap">
+      <h2 class="display">Support</h2>
+      <p class="sub">Questions or feedback? Write to <a href="mailto:TarasNesterenko276@icloud.com">TarasNesterenko276@icloud.com</a>. We usually reply within two working days.</p>
+      <details><summary>How do I rivet a floor?</summary><p>Right after a module lands, a ring closes in on the joint. Tap again the moment it meets the yellow mark. A riveted floor scores double and survives collapses.</p></details>
+      <details><summary>Why did my tower collapse?</summary><p>Too much sway. Watch the plumb bob in the bottom-left corner: land while it passes through the green band to calm the tower, and form Sky Garden districts to halve the sway.</p></details>
+      <details><summary>Do I need an internet connection?</summary><p>No. The whole game plays offline. The weekly league board only refreshes when you are online.</p></details>
+      <details><summary>Are there ads or purchases?</summary><p>No. Bolts are earned only by playing, and there is nothing to buy with real money.</p></details>
+      <details><summary>How do I start over?</summary><p>Open the Site Office from the hoist pendant and use Reset progress. This permanently clears bolts, upgrades, foremen and the shift log.</p></details>
+      <details><summary>When do weekly orders and the league reset?</summary><p>Every Monday at 00:00 UTC. Each site order pays once per week.</p></details>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <div class="legal">
+        <h2 class="display">Privacy Policy</h2>
+        <p class="typed">Effective 17 November 2026</p>
+        <p>Rivet Rise is designed to collect as little as possible.</p>
+        <h3>Data we collect</h3>
+        <p>The app does not require a personal account and contains no ads. Adjust may process install attribution to measure campaign performance. The app stores your local progress (bolts, upgrades, foremen, shift history and settings) on your device.</p>
+        <h3>Weekly league</h3>
+        <p>When you open the weekly league, Rivet Rise sends an anonymous app identity to Supabase so it can keep your crew profile and weekly results. Completed shifts send your floors, score, rivets, perfect drops, districts, duration and chosen foreman so the board can rank your crew. Your crew name is generated by the app. Rivet Rise does not upload your local save file.</p>
+        <h3>Children</h3>
+        <p>The app does not knowingly collect personal information from anyone, including children.</p>
+        <h3>Contact</h3>
+        <p>Questions about privacy: <a href="mailto:TarasNesterenko276@icloud.com">TarasNesterenko276@icloud.com</a>.</p>
+      </div>
+      <div class="legal" id="terms">
+        <h2 class="display">Terms of Use</h2>
+        <p class="typed">Effective 17 November 2026</p>
+        <h3>The game</h3>
+        <p>Rivet Rise is provided for personal entertainment. Bolts and cosmetic rewards are in-game items with no monetary value. They cannot be bought, sold or exchanged for money.</p>
+        <h3>Fair play</h3>
+        <p>Do not tamper with the app or its data to manipulate the weekly league. We may remove results that are clearly not achieved through normal play.</p>
+        <h3>Availability</h3>
+        <p>The game is provided "as is". We work to keep it running smoothly but cannot guarantee it will be error-free.</p>
+        <h3>Changes</h3>
+        <p>We may update these terms. The date at the top always shows the current version.</p>
+        <h3>Contact</h3>
+        <p><a href="mailto:TarasNesterenko276@icloud.com">TarasNesterenko276@icloud.com</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="hazard"></div>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Rivet Rise. All rights reserved.</span>
+    <span><a href="#privacy">Privacy Policy</a> · <a href="#terms">Terms of Use</a> · <a href="#support">Support</a></span>
+  </div>
+</footer>
+</body>
+</html>

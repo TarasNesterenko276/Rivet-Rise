@@ -1,0 +1,22 @@
+project_id = "sdtdbhbhdbnuoicxwssh"
+
+[auth]
+enable_anonymous_sign_ins = true
+
+[functions.resolve-player]
+verify_jwt = true
+
+[functions.weekly-board]
+verify_jwt = true
+
+[functions.submit-shift]
+verify_jwt = true
+
+[functions.claim-reward]
+verify_jwt = true
+
+[functions.player-profile]
+verify_jwt = true
+
+[functions.launch-check]
+verify_jwt = true
