@@ -22,7 +22,12 @@ workflows:
           set -e
           cd "$CM_BUILD_DIR"
           LATEST_BUILD_NUMBER="$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")"
-          agvtool new-version -all "$((LATEST_BUILD_NUMBER + 1))"
+          CODEMAGIC_BUILD_NUMBER="${BUILD_NUMBER:-0}"
+          NEXT_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          if [ "$NEXT_BUILD_NUMBER" -le "$CODEMAGIC_BUILD_NUMBER" ]; then
+            NEXT_BUILD_NUMBER=$((CODEMAGIC_BUILD_NUMBER + 1))
+          fi
+          agvtool new-version -all "$NEXT_BUILD_NUMBER"
       - name: Build signed IPA
         script: xcode-project build-ipa --project "$CM_BUILD_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
     artifacts:
